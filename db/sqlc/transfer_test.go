@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"database/sql"
 	"testing"
 	"time"
 
@@ -10,10 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func createRandomTransfer(t *testing.T) Transfer {
-	account1 := createRandomAccount(t)
-	account2 := createRandomAccount(t)
-
+func createRandomTransfer(t *testing.T, account1, account2 Account) Transfer {
 	arg := CreateTransferParams{
 		FromAccountID: account1.ID,
 		ToAccountID:   account2.ID,
@@ -24,25 +20,28 @@ func createRandomTransfer(t *testing.T) Transfer {
 	require.NoError(t, err)
 	require.NotEmpty(t, transfer)
 
-	require.Equal(t, arg.FromAccountID, account1.ID)
-	require.Equal(t, arg.ToAccountID, account2.ID)
+	require.Equal(t, arg.FromAccountID, transfer.FromAccountID)
+	require.Equal(t, arg.ToAccountID, transfer.ToAccountID)
 	require.Equal(t, arg.Amount, transfer.Amount)
 
 	require.NotZero(t, transfer.ID)
-	require.NotZero(t, transfer.CreatedAtt)
+	require.NotZero(t, transfer.CreatedAt)
 
 	return transfer
-
 }
 
 func TestCreateTransfer(t *testing.T) {
-	createRandomTransfer(t)
+	account1 := createRandomAccount(t)
+	account2 := createRandomAccount(t)
+	createRandomTransfer(t, account1, account2)
 }
 
 func TestGetTransfer(t *testing.T) {
-	transfer1 := createRandomTransfer(t)
-	transfer2, err := testQueries.GetTransfer(context.Background(), transfer1.ID)
+	account1 := createRandomAccount(t)
+	account2 := createRandomAccount(t)
+	transfer1 := createRandomTransfer(t, account1, account2)
 
+	transfer2, err := testQueries.GetTransfer(context.Background(), transfer1.ID)
 	require.NoError(t, err)
 	require.NotEmpty(t, transfer2)
 
@@ -50,60 +49,31 @@ func TestGetTransfer(t *testing.T) {
 	require.Equal(t, transfer1.FromAccountID, transfer2.FromAccountID)
 	require.Equal(t, transfer1.ToAccountID, transfer2.ToAccountID)
 	require.Equal(t, transfer1.Amount, transfer2.Amount)
-	require.WithinDuration(t, transfer1.CreatedAtt, transfer2.CreatedAtt, time.Second)
+	require.WithinDuration(t, transfer1.CreatedAt, transfer2.CreatedAt, time.Second)
 }
 
-func TestUpdateTransfer(t *testing.T) {
-	transfer1 := createRandomTransfer(t)
+func TestListTransfer(t *testing.T) {
+	account1 := createRandomAccount(t)
+	account2 := createRandomAccount(t)
 
-	arg := UpdateTransferParams{
-		FromAccountID: transfer1.FromAccountID,
-		ToAccountID:   transfer1.ToAccountID,
-		Amount:        util.RandomMoney(),
-		ID:            transfer1.ID,
-	}
-
-	transfer2, err := testQueries.UpdateTransfer(context.Background(), arg)
-	require.NoError(t, err)
-	require.NotEmpty(t, transfer2)
-
-	require.Equal(t, transfer1.ID, transfer2.ID)
-	require.Equal(t, transfer1.FromAccountID, transfer2.FromAccountID)
-	require.Equal(t, transfer1.ToAccountID, transfer2.ToAccountID)
-	require.Equal(t, arg.Amount, transfer2.Amount)
-	require.WithinDuration(t, transfer1.CreatedAtt, transfer2.CreatedAtt, time.Second)
-}
-
-func TestDeleteTransfer(t *testing.T) {
-
-	transfer1 := createRandomTransfer(t)
-
-	err := testQueries.DeleteTransfer(context.Background(), transfer1.ID)
-	require.NoError(t, err)
-
-	transfer2, err := testQueries.GetTransfer(context.Background(), transfer1.ID)
-	require.Error(t, err)
-	require.EqualError(t, err, sql.ErrNoRows.Error())
-	require.Empty(t, transfer2)
-}
-
-func TestListTransfers(t *testing.T) {
-
-	for i := 0; i < 10; i++ {
-		createRandomTransfer(t)
+	for i := 0; i < 5; i++ {
+		createRandomTransfer(t, account1, account2)
+		createRandomTransfer(t, account2, account1)
 	}
 
 	arg := ListTransfersParams{
-		Limit:  5,
-		Offset: 5,
+		FromAccountID: account1.ID,
+		ToAccountID:   account1.ID,
+		Limit:         5,
+		Offset:        5,
 	}
 
-	entries, err := testQueries.ListTransfers(context.Background(), arg)
+	transfers, err := testQueries.ListTransfers(context.Background(), arg)
 	require.NoError(t, err)
-	require.Len(t, entries, 5)
+	require.Len(t, transfers, 5)
 
-	for _, transfer := range entries {
+	for _, transfer := range transfers {
 		require.NotEmpty(t, transfer)
+		require.True(t, transfer.FromAccountID == account1.ID || transfer.ToAccountID == account1.ID)
 	}
-
 }
