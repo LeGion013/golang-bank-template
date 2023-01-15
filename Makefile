@@ -32,4 +32,4 @@ mock:
 	mockgen -package mockdb -destination db/mock/store.go github.com/LeGion013/banktemplate/db/sqlc Store
 
 
-.PHONY: postgres createdb dropdb migrateup migratedown sqlc test server mock migratedown1 migrateup1
+.PHONY: postgres createdb dropdb migrateup migratedown migratedown1 migrateup1 sqlc test server mock 
