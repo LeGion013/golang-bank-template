@@ -1,14 +1,13 @@
 package api
 
-import "github.com/go-playground/validator/v10"
+import (
+	"github.com/LeGion013/banktemplate/util"
+	"github.com/go-playground/validator/v10"
+)
 
-var validCurrency validator.Func = func(fieledLevel validator.FieldLevel) bool {
-	if currency, ok := fieledLevel.Field().Interface().(string); ok {
-		// check if currency si supported
-		print(currency)
-		return true
+var validCurrency validator.Func = func(fieldLevel validator.FieldLevel) bool {
+	if currency, ok := fieldLevel.Field().Interface().(string); ok {
+		return util.IsSupportedCurrency(currency)
 	}
-
 	return false
-
 }
