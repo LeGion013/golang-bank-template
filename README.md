@@ -12,3 +12,10 @@ migrate -help
 ```
 migrate create -ext sql -dir db/migration -seq add_users
 ```
+
+### Docker build
+
+* How to build the docker image: 
+```
+docker build -t banktemplate:latest .
+```
