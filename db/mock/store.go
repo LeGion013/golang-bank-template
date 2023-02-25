@@ -62,6 +62,7 @@ func (m *MockStore) CreateAccount(arg0 context.Context, arg1 db.CreateAccountPar
 // CreateAccount indicates an expected call of CreateAccount.
 func (mr *MockStoreMockRecorder) CreateAccount(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
+	
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAccount", reflect.TypeOf((*MockStore)(nil).CreateAccount), arg0, arg1)
 }
 
