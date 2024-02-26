@@ -1,0 +1,11 @@
+# ~/personal/.gitconfig.pers
+ 
+[user]
+email = legionbsd13@gmail.com
+name = name = LeGion13
+ 
+[github]
+user = "LeGion013"
+ 
+[core]
+sshCommand = "ssh -i ~/.ssh/id_ed25519"
