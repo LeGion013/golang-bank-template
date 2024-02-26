@@ -115,4 +115,9 @@ aws secretsmanager get-secret-value --secret-id simple_bank --query SecretString
 aws secretsmanager get-secret-value --secret-id simple_bank --query SecretString --output text | jq -r 'to_entries|map("\(.key)=\(.value)")|.[]' > app.env
 ```
 
+* pull docker image from ECR
+```
+aws ecr get-login-password | docker login --username AWS --password-stdin 959551383946.dkr.ecr.us-east-2.amazonaws.com
+```
+
 export PATH=$PATH:/usr/local/go/bin
