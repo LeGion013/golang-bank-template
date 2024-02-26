@@ -65,3 +65,54 @@ docker network create <network_name>
 ```
 docker network connect <network_name> <container_id>
 ```
+
+### Generate random
+
+* How to generate random string: 
+```
+openssl rand -hex 64
+```
+
+* How to generate random string and take first 32: 
+```
+openssl rand -hex 64 | head -c 32
+```
+
+
+### Install aws cli
+
+* Use curl:
+```
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+```
+
+* aws configure
+
+
+```
+ls -l ~/.aws
+```
+
+* get secrets:
+```
+aws secretsmanager get-secret-value --secret-id name_of_the_secret
+```
+
+* get secrets with filter:
+```
+aws secretsmanager get-secret-value --secret-id simple_bank --query SecretString
+```
+
+* get secrets with filter and in text fromat:
+```
+aws secretsmanager get-secret-value --secret-id simple_bank --query SecretString --output text
+```
+
+* get secrets with filter and in text fromat and write them to the app.env:
+```
+aws secretsmanager get-secret-value --secret-id simple_bank --query SecretString --output text | jq -r 'to_entries|map("\(.key)=\(.value)")|.[]' > app.env
+```
+
+export PATH=$PATH:/usr/local/go/bin
